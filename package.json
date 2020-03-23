@@ -1,0 +1,32 @@
+{
+  "name": "ecb-exchnagerate",
+  "version": "0.1.0",
+  "description": "Small js warpper for the currency exchnge rate REST API provided by the ECB with SPMX",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/semklauke/ecb-exchangerate.git"
+  },
+  "keywords": [
+    "ECB",
+    "Currency"
+  ],
+  "author": "Sem Klauke",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/semklauke/ecb-exchangerate/issues"
+  },
+  "homepage": "https://github.com/semklauke/ecb-exchangerate#readme",
+  "dependencies": {
+    "@types/node": "^13.9.3",
+    "typescript": "^3.8.3"
+  },
+  "devDependencies": {
+    "@types/jest": "^25.1.4",
+    "jest": "^25.1.0",
+    "ts-jest": "^25.2.1"
+  }
+}
