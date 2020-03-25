@@ -2,7 +2,8 @@
   "name": "ecb-exchnagerate",
   "version": "0.1.0",
   "description": "Small js warpper for the currency exchnge rate REST API provided by the ECB with SPMX",
-  "main": "index.js",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
