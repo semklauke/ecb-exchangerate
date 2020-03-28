@@ -1,4 +1,4 @@
-import { Currency } from './types';
+import { Currency } from './../types';
 
 export const currencies: { [code: string]: Currency } = {
     "ADF": { code: "ADF", name: "Andorran Franc (1-1 peg to the French franc)" },
