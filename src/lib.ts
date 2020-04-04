@@ -1,12 +1,10 @@
-import https from 'https';
+import { RequestOptions, request as https_request, get as https_get } from 'https';
 
 import { Currency, ExchangeRate, ExchangeRateOptions, ExchangeRateData } from './types';
 import { Frequency } from './codelists/frequencies';
 import { DataType } from './codelists/datatype';
 import { currencies }  from './codelists/currencies';
 import './date.extensions';
-
-const baseUrl: string = "/service/data/ECB,EXR,1.0/";
 
 interface FixedExchangeRateOptions {
     frequency: Frequency,
@@ -47,7 +45,8 @@ export function rate(b: Currency, t: Currency | Currency[], o?: ExchangeRateOpti
             if (i != clength-1) key += "+";
             else key += ".";
         }
-
+    } else {
+        key += t.code + ".";
     }
     key += b.code + ".";
     key += options.exchnageRateType + ".";
@@ -96,29 +95,26 @@ export function rate(b: Currency, t: Currency | Currency[], o?: ExchangeRateOpti
                 date: new Date(dates[""+counter].start as string),
             });
             counter++;
+
         }
 
         if (counter === 0)
             return null;
         else 
             return result;
-    }    
+    }
 
     // get data
-    const request_options: https.RequestOptions = {
-      hostname: "a-sdw-wsrest.ecb.int",
-      port: 443,
-      path: '/service/data/ECB,EXR,1.0/' + path_extension,
-      method: 'GET',
+    const baseUrl: string = "https://a-sdw-wsrest.ecb.int/service/data/ECB,EXR,1.0/";
+    const request_options: RequestOptions = {
       headers: {
         'Accept' : 'application/json'
       }
     }
 
     return new Promise<ExchangeRateData>(function(resolve, reject) {
-        const req = https.request(request_options, (resp) => {
+        const req = https_get(baseUrl+path_extension, request_options, (resp) => {
             let data = '';
-
             resp.on('data', (chunk) => {
                 data += chunk;
             });
@@ -160,8 +156,8 @@ export function rate(b: Currency, t: Currency | Currency[], o?: ExchangeRateOpti
 
 
 function dateToECBBullshit(d: Date, f: Frequency) : string {
-    let period: string = "" + d.getFullYear();
-    const month: number = d.getMonth();
+    let period: string = "" + d.getUTCFullYear();
+    const month: number = d.getUTCMonth() + 1;
     switch (f) {
         case Frequency.Annual:
             break;
@@ -177,14 +173,14 @@ function dateToECBBullshit(d: Date, f: Frequency) : string {
             else period += "-Q4";
             break;
         case Frequency.Monthly:
-            period += ("00" + month).slice(-2);
+            period += "-" + ("00" + month).slice(-2);
             break;
         case Frequency.Weekly:
             period += "-W" + ("00" + d.getISO8601Week()).slice(-2);
             break;
         case Frequency.Daily: 
-            period += ("00" + month).slice(-2);
-            period += ("00" + d.getDate()).slice(-2);
+            period += "-" + ("00" + month).slice(-2);
+            period += "-" + ("00" + d.getDate()).slice(-2);
             break
         default:
             period = d.toISOString();
