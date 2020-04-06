@@ -1,11 +1,11 @@
 {
   "name": "ecb-exchnagerate",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Small js warpper for the currency exchnge rate REST API provided by the ECB with SPMX",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node node_modules/jest/bin/jest.js",
     "postinstall": "tsc"
   },
   "repository": {
@@ -27,8 +27,8 @@
     "typescript": "^3.8.3"
   },
   "devDependencies": {
-    "@types/jest": "^25.1.4",
+    "@types/jest": "^25.2.1",
     "jest": "^25.1.0",
-    "ts-jest": "^25.2.1"
+    "ts-jest": "^25.3.1"
   }
 }
