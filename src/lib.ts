@@ -10,7 +10,8 @@ interface FixedExchangeRateOptions {
     frequency: Frequency,
     dataType: DataType,
     startDate: Date,
-    endDate: Date,
+    endDate: Date | null,
+    baseCurrency: Currency,
     exchnageRateType: string,
 }
 
@@ -22,33 +23,33 @@ export function defaults() : FixedExchangeRateOptions {
         frequency: Frequency.Daily,
         dataType: DataType.Average,
         startDate: new Date(),
+        endDate: null,
+        baseCurrency: currencies["EUR"],
         exchnageRateType: 'SP00'
     };
 }
 
 
-export function rate(base: Currency, target: Currency, options?: ExchangeRateOptions) : Promise<ExchangeRateData>;
-export function rate(base: Currency, targets: Currency[], options?: ExchangeRateOptions) :  Promise<ExchangeRateData>;
-export function rate(b: Currency, t: Currency | Currency[], o?: ExchangeRateOptions) : Promise<ExchangeRateData> {
+export function rate(target: Currency | Currency[], opt?: ExchangeRateOptions) : Promise<ExchangeRateData> {
     
     
     // apply default options
-    let options: FixedExchangeRateOptions =  Object.assign(defaults(), o);
+    let options: FixedExchangeRateOptions =  Object.assign(defaults(), opt);
 
     // build key
     let key: string = "";
     key += options.frequency + ".";
-    if (t instanceof Array) {
-        const clength: number = t.length;
+    if (target instanceof Array) {
+        const clength: number = target.length;
         for (let i = 0; i < clength; i++) {
-            key += t[i].code;
+            key += target[i].code;
             if (i != clength-1) key += "+";
             else key += ".";
         }
     } else {
-        key += t.code + ".";
+        key += target.code + ".";
     }
-    key += b.code + ".";
+    key += options.baseCurrency.code + ".";
     key += options.exchnageRateType + ".";
     key += options.dataType;
 
@@ -69,7 +70,7 @@ export function rate(b: Currency, t: Currency | Currency[], o?: ExchangeRateOpti
 
     // endPeriod
     let endPeriod: string | null = null;
-    if (options.endDate)
+    if (options.endDate !== null)
         endPeriod = dateToECBBullshit(options.endDate, options.frequency);
 
     let path_extension = key + "?startPeriod=" + startPeriod;
@@ -114,34 +115,51 @@ export function rate(b: Currency, t: Currency | Currency[], o?: ExchangeRateOpti
 
     return new Promise<ExchangeRateData>(function(resolve, reject) {
         const req = https_get(baseUrl+path_extension, request_options, (resp) => {
-            let data = '';
-            resp.on('data', (chunk) => {
+
+            if (resp.statusCode === 400)
+                reject(new Error("Bad Request"));
+            else if (resp.statusCode === 404)  {
+                reject(null);
+            } else {
+
+
+            let data: string = '';
+            resp.on('data', (chunk: string) => {
                 data += chunk;
             });
       
             resp.on('end', () => {
-                const jsonData = JSON.parse(data);
-                let final: ExchangeRateData = {
-                    frequency: options.frequency,
-                    dataType: options.dataType,
-                    currencies: {}
-                };
+                if (data === 'No results found.')
+                    reject(null);
+                else if (data === 'No match found.')
+                    reject(new Error("Bad Request"));
+                else if (data === '')
+                    reject(null);
+                else {
+                    const jsonData: object = JSON.parse(data);
+                    let final: ExchangeRateData = {
+                        frequency: options.frequency,
+                        dataType: options.dataType,
+                        currencies: {}
+                    };
 
-                let a: Currency[] = t instanceof Array ? t : [t];
+                    let a: Currency[] = target instanceof Array ? target : [target];
 
-                for (let i = 0; i<a.length; i++) {
-                    let series_data = parseValues(jsonData, i);
-                    if (series_data) {
-                        final.currencies[series_data.cur.code] = {
-                            currency: series_data.cur,
-                            values: series_data.er
-                        } 
-                    } else
-                        reject(null);
+                    for (let i = 0; i<a.length; i++) {
+                        let series_data = parseValues(jsonData, i);
+                        if (series_data) {
+                            final.currencies[series_data.cur.code] = {
+                                currency: series_data.cur,
+                                values: series_data.er
+                            } 
+                        } else
+                            reject(null);
+                    }
+
+                    resolve(final);
                 }
-
-                resolve(final);
             });
+            }
 
         }).on("error", (err) => {
             reject(err);
