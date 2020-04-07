@@ -170,6 +170,21 @@ export function rate(target: Currency | Currency[], opt?: ExchangeRateOptions) :
 
 }
 
+export function rateAt(target: Currency | Currency[], date: Date, options?: ExchangeRateOptions) : Promise<ExchangeRateData> {
+    let opt: ExchangeRateOptions =  Object.assign({ startDate: date }, options);
+    if (!isToday(date)) {
+        let d = new Date();
+        d.setUTCDate(date.getUTCDate() + 1);
+        opt.endDate = d;
+    }
+    return rate(target, opt);
+}
+
+export function rateBetween(target: Currency | Currency[], startDate: Date, endDate: Date, options?: ExchangeRateOptions) : Promise<ExchangeRateData> {
+    let opt: ExchangeRateOptions =  Object.assign({ startDate, endDate }, options);
+    return rate(target, opt);
+}
+
 
 
 

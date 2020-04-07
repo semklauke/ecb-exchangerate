@@ -240,6 +240,41 @@ describe('rate success, period', () => {
         expect(res.currencies['CAD'].values.length).toBeGreaterThanOrEqual(15);
     });
 
-    
-    
+   
+});
+
+describe('wrapper functions', () => {
+
+    test('rateAt', async () => {
+        const defaults = ecb.defaults();
+        let d: Date = new Date('2020-01-01');
+        const res = await ecb.rateAt([ecb.currencies['CHF'], ecb.currencies['USD'], ecb.currencies['CAD']], d);
+        expect(res).not.toBeNull();
+        expect(res).toBeDefined();
+        expect(typeof res).toBe("object");
+        expect(Array.isArray(res.currencies['USD'].values)).toBe(true);
+        expect(Array.isArray(res.currencies['CHF'].values)).toBe(true);
+        expect(Array.isArray(res.currencies['CAD'].values)).toBe(true);
+        expect(res.currencies['USD'].values.length).not.toBe(0);
+        expect(res.currencies['CAD'].values.length).not.toBe(0);
+        expect(res.currencies['CHF'].values.length).not.toBe(0);
+        expect(res.frequency).toBe(defaults.frequency);
+        expect(res.dataType).toBe(defaults.dataType);
+        expect(res.currencies["USD"].currency).toMatchObject(ecb.currencies['USD']);
+        expect(res.currencies["CHF"].currency).toMatchObject(ecb.currencies['CHF']);
+        expect(res.currencies["CAD"].currency).toMatchObject(ecb.currencies['CAD']);
+    });
+
+
+     test('rateBetween', async () => {
+        let d: Date = new Date();
+        d.setUTCDate(new Date().getUTCDate() - 21);
+        const res = await ecb.rateBetween([ecb.currencies['CHF'], ecb.currencies['USD'], ecb.currencies['CAD']], d, new Date());
+        expect(res).not.toBeNull();
+        expect(res).toBeDefined();
+        expect(typeof res).toBe("object");
+        expect(res.currencies['USD'].values.length).toBeGreaterThanOrEqual(15);
+        expect(res.currencies['CHF'].values.length).toBeGreaterThanOrEqual(15);
+        expect(res.currencies['CAD'].values.length).toBeGreaterThanOrEqual(15);
+    });
 });
