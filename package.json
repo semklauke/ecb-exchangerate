@@ -1,5 +1,5 @@
 {
-  "name": "ecb-exchnagerate",
+  "name": "ecb-exchangerate",
   "version": "0.2.0",
   "description": "Small js warpper for the currency exchnge rate REST API provided by the ECB with SPMX",
   "main": "lib/index.js",

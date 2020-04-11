@@ -12,7 +12,7 @@ interface FixedExchangeRateOptions {
     startDate: Date,
     endDate: Date | null,
     baseCurrency: Currency,
-    exchnageRateType: string,
+    exchangeRateType: string,
 }
 
 
@@ -25,7 +25,7 @@ export function defaults() : FixedExchangeRateOptions {
         startDate: new Date(),
         endDate: null,
         baseCurrency: currencies["EUR"],
-        exchnageRateType: 'SP00'
+        exchangeRateType: 'SP00'
     };
 }
 
@@ -50,7 +50,7 @@ export function rate(target: Currency | Currency[], opt?: ExchangeRateOptions) :
         key += target.code + ".";
     }
     key += options.baseCurrency.code + ".";
-    key += options.exchnageRateType + ".";
+    key += options.exchangeRateType + ".";
     key += options.dataType;
 
     if (isToday(options.startDate)) {
@@ -66,12 +66,12 @@ export function rate(target: Currency | Currency[], opt?: ExchangeRateOptions) :
     }
 
     // startPeriod
-    let startPeriod: string = dateToECBBullshit(options.startDate, options.frequency);
+    let startPeriod: string = dateToECBDateFormat(options.startDate, options.frequency);
 
     // endPeriod
     let endPeriod: string | null = null;
     if (options.endDate !== null)
-        endPeriod = dateToECBBullshit(options.endDate, options.frequency);
+        endPeriod = dateToECBDateFormat(options.endDate, options.frequency);
 
     let path_extension = key + "?startPeriod=" + startPeriod;
     if (endPeriod !== null) path_extension += "&endPeriod=" + endPeriod;
@@ -112,6 +112,8 @@ export function rate(target: Currency | Currency[], opt?: ExchangeRateOptions) :
         'Accept' : 'application/json'
       }
     }
+
+    console.log(baseUrl+path_extension);
 
     return new Promise<ExchangeRateData>(function(resolve, reject) {
         const req = https_get(baseUrl+path_extension, request_options, (resp) => {
@@ -188,7 +190,7 @@ export function rateBetween(target: Currency | Currency[], startDate: Date, endD
 
 
 
-function dateToECBBullshit(d: Date, f: Frequency) : string {
+function dateToECBDateFormat(d: Date, f: Frequency) : string {
     let period: string = "" + d.getUTCFullYear();
     const month: number = d.getUTCMonth() + 1;
     switch (f) {

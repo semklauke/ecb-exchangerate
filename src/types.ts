@@ -17,7 +17,7 @@ export interface ExchangeRateOptions {
     startDate?: Date,
     endDate?: Date,
     baseCurrency?: Currency,
-    exchnageRateType?: string,
+    exchangeRateType?: string,
 }
 
 export interface ExchangeRateData {
