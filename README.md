@@ -1,4 +1,4 @@
-# ecb-exchnagerate
+# ecb-exchangerate
 Small wrapper for the ecb currency exchnage rate api.
 
 ## Install
@@ -20,9 +20,11 @@ let resultPromise = rate({ code: "USD" });
 
 ## Functions
 
-### `rate(target: Currency | Currency[], opt?: ExchangeRateOptions) : Promise<ExchangeRateData>`
-### `rateAt(target: Currency | Currency[], date: Date, options?: ExchangeRateOptions) : Promise<ExchangeRateData>`
-### `rateBetween(target: Currency | Currency[], startDate: Date, endDate: Date, options?: ExchangeRateOptions) : Promise<ExchangeRateData>`
+```typescript
+rate(target: Currency | Currency[], opt?: ExchangeRateOptions) : Promise<ExchangeRateData>
+rateAt(target: Currency | Currency[], date: Date, options?: ExchangeRateOptions) : Promise<ExchangeRateData>
+rateBetween(target: Currency | Currency[], startDate: Date, endDate: Date, options?: ExchangeRateOptions) : Promise<ExchangeRateData>
+```
 
 ## Options
 The options parameter gets an object of type `ExchangeRateOptions`. It is optional.<br/>
@@ -41,8 +43,8 @@ All options have default values and are optional, so you only have to specify th
 &emsp;Currently ECB only supports Euro as base currency (dah!)<br />
 &emsp;Default: `{ code: 'EUR' }`
 #### `exchnageRateType?: string`
-&emsp;Dont know what this does tho. Look [here](https://sdw.ecb.europa.eu/datastructure.do?conceptMnemonic=EXR_TYPE&datasetinstanceid=120#cl) 
-&emsp;Default: `'SP00'`
+&emsp;Dont know what this does tho. Look [here](https://sdw.ecb.europa.eu/datastructure.do?conceptMnemonic=EXR_TYPE&datasetinstanceid=120#cl)  
+&emsp;Default:`'SP00'`
 
  
 
@@ -67,7 +69,7 @@ rate( currencies["USD"] ).then(data => {
 ```typescript
 import { currencies, rate, ExchangeRate } from 'ecb-exchangerate';
 
-rate( currencies["USD"], currencies["CAD"] ).then(data => {
+rate( [currencies["USD"], currencies["CAD"]] ).then(data => {
 	let euro_usd: ExchangeRate = data.currencies["USD"].values[0];
 	let euro_cad: ExchangeRate = data.currencies["CAD"].values[0];
 	console.log(`Most recent EUR/USD rate at ${ euro_usd.date } is ${ euro_usd.value });
@@ -77,7 +79,7 @@ rate( currencies["USD"], currencies["CAD"] ).then(data => {
 });
 ```
 
-#### Get Average EUR/USD exchangrate over the last year (2019)
+#### Get Average EUR/USD exchangerate over the last year (2019)
 ```typescript
 import { currencies, rate, ExchangeRate, Frequency } from 'ecb-exchangerate';
 let options = {
