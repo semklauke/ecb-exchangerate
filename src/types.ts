@@ -16,6 +16,7 @@ export interface ExchangeRateOptions {
     dataType?: DataType,
     startDate?: Date,
     endDate?: Date,
+    mostRecent?: boolean,
     baseCurrency?: Currency,
     exchangeRateType?: string,
 }

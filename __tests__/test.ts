@@ -134,7 +134,8 @@ describe('rate error, no period', () => {
         let d: Date = new Date();
         d.setUTCDate(new Date().getUTCDate() + 1 );
         const options: ecb.ExchangeRateOptions = {
-            startDate: d
+            startDate: d,
+            mostRecent: false
         };
         await expect(ecb.rate(ecb.currencies['USD'], options)).rejects.toThrow();
     });
@@ -143,7 +144,8 @@ describe('rate error, no period', () => {
         let d: Date = new Date();
         const options: ecb.ExchangeRateOptions = {
             startDate: d,
-            frequency: ecb.Frequency.Weekly
+            frequency: ecb.Frequency.Weekly,
+            mostRecent: false
         };
         await expect(ecb.rate(ecb.currencies['USD'], options)).rejects.toBeNull();
     });
@@ -152,7 +154,8 @@ describe('rate error, no period', () => {
         let d: Date = new Date();
         const options: ecb.ExchangeRateOptions = {
             startDate: d,
-            frequency: ecb.Frequency.Monthly
+            frequency: ecb.Frequency.Monthly,
+            mostRecent: false
         };
         await expect(ecb.rate(ecb.currencies['USD'], options)).rejects.toBeNull();
     });
@@ -161,7 +164,8 @@ describe('rate error, no period', () => {
         let d: Date = new Date();
         const options: ecb.ExchangeRateOptions = {
             startDate: d,
-            frequency: ecb.Frequency.Annual
+            frequency: ecb.Frequency.Annual,
+            mostRecent: false
         };
         await expect(ecb.rate(ecb.currencies['USD'], options)).rejects.toBeNull();
     });
@@ -171,7 +175,8 @@ describe('rate error, no period', () => {
         let d: Date = new Date();
         const options: ecb.ExchangeRateOptions = {
             startDate: d,
-            frequency: ecb.Frequency.Annual
+            frequency: ecb.Frequency.Annual,
+            mostRecent: false
         };
         const cur: ecb.Currency = {
             code: "XYZ",
@@ -221,7 +226,7 @@ describe('rate success, period', () => {
         expect(res).not.toBeNull();
         expect(res).toBeDefined();
         expect(Array.isArray(res.currencies['USD'].values)).toBe(true);
-        expect(res.currencies['USD'].values.length).toBeGreaterThanOrEqual(15); 
+        expect(res.currencies['USD'].values.length).toBeGreaterThanOrEqual(2); 
     });
 
     test('rate period, 3 currecies', async () => {
@@ -235,9 +240,9 @@ describe('rate success, period', () => {
         expect(res).not.toBeNull();
         expect(res).toBeDefined();
         expect(typeof res).toBe("object");
-        expect(res.currencies['USD'].values.length).toBeGreaterThanOrEqual(15);
-        expect(res.currencies['CHF'].values.length).toBeGreaterThanOrEqual(15);
-        expect(res.currencies['CAD'].values.length).toBeGreaterThanOrEqual(15);
+        expect(res.currencies['USD'].values.length).toBeGreaterThanOrEqual(2);
+        expect(res.currencies['CHF'].values.length).toBeGreaterThanOrEqual(2);
+        expect(res.currencies['CAD'].values.length).toBeGreaterThanOrEqual(2);
     });
 
    
@@ -273,8 +278,8 @@ describe('wrapper functions', () => {
         expect(res).not.toBeNull();
         expect(res).toBeDefined();
         expect(typeof res).toBe("object");
-        expect(res.currencies['USD'].values.length).toBeGreaterThanOrEqual(15);
-        expect(res.currencies['CHF'].values.length).toBeGreaterThanOrEqual(15);
-        expect(res.currencies['CAD'].values.length).toBeGreaterThanOrEqual(15);
+        expect(res.currencies['USD'].values.length).toBeGreaterThanOrEqual(2);
+        expect(res.currencies['CHF'].values.length).toBeGreaterThanOrEqual(2);
+        expect(res.currencies['CAD'].values.length).toBeGreaterThanOrEqual(2);
     });
 });

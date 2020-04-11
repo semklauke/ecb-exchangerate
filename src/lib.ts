@@ -11,11 +11,10 @@ interface FixedExchangeRateOptions {
     dataType: DataType,
     startDate: Date,
     endDate: Date | null,
+    mostRecent: boolean,
     baseCurrency: Currency,
     exchangeRateType: string,
 }
-
-
 
 
 export function defaults() : FixedExchangeRateOptions {
@@ -24,6 +23,7 @@ export function defaults() : FixedExchangeRateOptions {
         dataType: DataType.Average,
         startDate: new Date(),
         endDate: null,
+        mostRecent: true,
         baseCurrency: currencies["EUR"],
         exchangeRateType: 'SP00'
     };
@@ -39,6 +39,7 @@ export function rate(target: Currency | Currency[], opt?: ExchangeRateOptions) :
     // build key
     let key: string = "";
     key += options.frequency + ".";
+
     if (target instanceof Array) {
         const clength: number = target.length;
         for (let i = 0; i < clength; i++) {
@@ -49,32 +50,35 @@ export function rate(target: Currency | Currency[], opt?: ExchangeRateOptions) :
     } else {
         key += target.code + ".";
     }
+
     key += options.baseCurrency.code + ".";
     key += options.exchangeRateType + ".";
     key += options.dataType;
 
-    if (isToday(options.startDate)) {
-        if (options.startDate.getUTCHours() < 15) {
-            options.startDate.setUTCDate(options.startDate.getUTCDate() - 1);
-        }
-        const day = options.startDate.getUTCDayMonday();
-        if (day === 6) {
-            options.startDate.setUTCDate(options.startDate.getUTCDate() - 2);
-        } else if (day === 5) {
-            options.startDate.setUTCDate(options.startDate.getUTCDate() - 1);
-        } 
-    }
 
-    // startPeriod
-    let startPeriod: string = dateToECBDateFormat(options.startDate, options.frequency);
-
-    // endPeriod
+    // date formatting
     let endPeriod: string | null = null;
-    if (options.endDate !== null)
-        endPeriod = dateToECBDateFormat(options.endDate, options.frequency);
+    let startPeriod: string;
+
+    if (options.mostRecent && options.endDate === null) {
+        // we want the most recent single value
+        // shift startPeriod 2 months back and endPeriod to the startDate
+        endPeriod = dateToECBDateFormat(options.startDate, options.frequency);
+        let newStartDate: Date = new Date(options.startDate);
+        newStartDate.setUTCDate(1);
+        newStartDate.setUTCMonth(newStartDate.getUTCMonth() - 2);
+        startPeriod = dateToECBDateFormat(newStartDate, options.frequency);
+    } else {
+        // dont entsure we get the most recent result beasue either the user does not wanto to (mostRecent === false)
+        // or the users wanst a period of values   
+        startPeriod = dateToECBDateFormat(options.startDate, options.frequency);
+        if (options.endDate !== null)
+            endPeriod = dateToECBDateFormat(options.endDate, options.frequency);
+    } 
 
     let path_extension = key + "?startPeriod=" + startPeriod;
     if (endPeriod !== null) path_extension += "&endPeriod=" + endPeriod;
+    if (options.mostRecent && options.endDate === null) path_extension += "&lastNObservations=1"
     path_extension += "&detail=dataonly";
 
     const parseValues = (d: object, series: number) : { er: ExchangeRate[], cur: Currency } | null => {
@@ -112,8 +116,6 @@ export function rate(target: Currency | Currency[], opt?: ExchangeRateOptions) :
         'Accept' : 'application/json'
       }
     }
-
-    console.log(baseUrl+path_extension);
 
     return new Promise<ExchangeRateData>(function(resolve, reject) {
         const req = https_get(baseUrl+path_extension, request_options, (resp) => {
