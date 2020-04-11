@@ -24,6 +24,8 @@ let resultPromise = rate({ code: "USD" });
 rate(target: Currency | Currency[], opt?: ExchangeRateOptions) : Promise<ExchangeRateData>
 rateAt(target: Currency | Currency[], date: Date, options?: ExchangeRateOptions) : Promise<ExchangeRateData>
 rateBetween(target: Currency | Currency[], startDate: Date, endDate: Date, options?: ExchangeRateOptions) : Promise<ExchangeRateData>
+
+codesToCurrencies(x: string[]) : Currency[];
 ```
 
 ## Options

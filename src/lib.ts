@@ -26,6 +26,8 @@ interface FixedExchangeRateOptions {
 }
 
 
+export const codesToCurrencies: (x: string[]) => Currency[] = x => x.map(c => currencies[c]);
+
 export function defaults() : FixedExchangeRateOptions {
     return <FixedExchangeRateOptions> {
         frequency: Frequency.Daily,
@@ -129,49 +131,61 @@ export function rate(target: Currency | Currency[], opt?: ExchangeRateOptions) :
     return new Promise<ExchangeRateData>(function(resolve, reject) {
         const req = https_get(baseUrl+path_extension, request_options, (resp) => {
 
-            if (resp.statusCode === 400)
+            if (resp.statusCode === 400 ||
+                resp.statusCode === 403 ||
+                resp.statusCode === 406 ||
+                resp.statusCode === 414    ) {
+
                 reject(new Error("Bad Request"));
-            else if (resp.statusCode === 404)  {
-                reject(null);
-            } else {
 
+            } else if (resp.statusCode === 401)
+                reject(new Error("Login needed"));
+            else if (resp.statusCode === 413)
+                reject(new Error("Results too large"));
+            else if (resp.statusCode === 500 ||
+                     resp.statusCode === 501 ||
+                     resp.statusCode === 503) {
+                reject(new Error("Server error"));
+            } else if (resp.statusCode === 404)
+                 reject(null);
+            else {
 
-            let data: string = '';
-            resp.on('data', (chunk: string) => {
-                data += chunk;
-            });
+                let data: string = '';
+                resp.on('data', (chunk: string) => {
+                    data += chunk;
+                });
       
-            resp.on('end', () => {
-                if (data === 'No results found.')
-                    reject(null);
-                else if (data === 'No match found.')
-                    reject(new Error("Bad Request"));
-                else if (data === '')
-                    reject(null);
-                else {
-                    const jsonData: object = JSON.parse(data);
-                    let final: ExchangeRateData = {
-                        frequency: options.frequency,
-                        dataType: options.dataType,
-                        currencies: {}
-                    };
+                resp.on('end', () => {
+                    if (data === 'No results found.')
+                        reject(null);
+                    else if (data === 'No match found.')
+                        reject(new Error("Bad Request"));
+                    else if (data === '')
+                        reject(null);
+                    else {
+                        const jsonData: object = JSON.parse(data);
+                        let final: ExchangeRateData = {
+                            frequency: options.frequency,
+                            dataType: options.dataType,
+                            currencies: {}
+                        };
 
-                    let a: Currency[] = target instanceof Array ? target : [target];
+                        let a: Currency[] = target instanceof Array ? target : [target];
 
-                    for (let i = 0; i<a.length; i++) {
-                        let series_data = parseValues(jsonData, i);
-                        if (series_data) {
-                            final.currencies[series_data.cur.code] = {
-                                currency: series_data.cur,
-                                values: series_data.er
-                            } 
-                        } else
-                            reject(null);
+                        for (let i = 0; i<a.length; i++) {
+                            let series_data = parseValues(jsonData, i);
+                            if (series_data) {
+                                final.currencies[series_data.cur.code] = {
+                                    currency: series_data.cur,
+                                    values: series_data.er
+                                } 
+                            } else
+                                reject(null);
+                        }
+
+                        resolve(final);
                     }
-
-                    resolve(final);
-                }
-            });
+                });
             }
 
         }).on("error", (err) => {
