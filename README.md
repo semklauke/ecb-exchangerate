@@ -60,7 +60,7 @@ import { currencies, rate, ExchangeRate } from 'ecb-exchangerate';
 
 rate( currencies["USD"] ).then(data => {
 	let euro_usd: ExchangeRate = data.currencies["USD"].values[0];
-	console.log(`Most recent EUR/USD rate at ${ euro_usd.date } is ${ euro_usd.value });
+	console.log(`Most recent EUR/USD rate at ${ euro_usd.date } is ${ euro_usd.value }`);
 }).catch(err => {
 	if (err === null) {
 		// ECB API gave no values back
@@ -77,8 +77,8 @@ import { currencies, rate, ExchangeRate } from 'ecb-exchangerate';
 rate( [currencies["USD"], currencies["CAD"]] ).then(data => {
 	let euro_usd: ExchangeRate = data.currencies["USD"].values[0];
 	let euro_cad: ExchangeRate = data.currencies["CAD"].values[0];
-	console.log(`Most recent EUR/USD rate at ${ euro_usd.date } is ${ euro_usd.value });
-	console.log(`Most recent EUR/CAD rate at ${ euro_cad.date } is ${ euro_cad.value });
+	console.log(`Most recent EUR/USD rate at ${ euro_usd.date } is ${ euro_usd.value }`);
+	console.log(`Most recent EUR/CAD rate at ${ euro_cad.date } is ${ euro_cad.value }`);
 }).catch(err => {
 	...
 });
@@ -94,7 +94,7 @@ let options = {
 }
 rate( currencies["USD"], options).then(data => {
 	let euro_usd: ExchangeRate = data.currencies["USD"].values[0];
-	console.log(`Average EUR/USD exchangrate over the last year is ${ euro_usd.value });
+	console.log(`Average EUR/USD exchangrate over the last year is ${ euro_usd.value }`);
 }).catch(err => {
 	...
 });
@@ -110,7 +110,7 @@ lastWeek.setUTCDate(new Date().getUTCDate() - 7);
 rateBetween(currencies["USD"], lastWeek, new Date()).then(data => {
 	let euro_usd: ExchangeRate[] = data.currencies["USD"].values;
 	for (let er of euro_usd) {
-		console.log(`EUR/USD rate at ${ er.date } is ${ er.value });
+		console.log(`EUR/USD rate at ${ er.date } is ${ er.value }`);
 	}
 }).catch(err => {
 	...
