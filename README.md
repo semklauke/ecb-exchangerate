@@ -39,6 +39,9 @@ All options have default values and are optional, so you only have to specify th
 #### `endDate?: Date`
 &emsp;For a period of values (UTC)<br />
 &emsp;Default: `null`
+#### `mostRecent?: boolean`
+&emsp;ECB only publishes values on workdays. If this is **true** the library gives you the most recent result for the date of `startDate` back (may be some days before `startDate`). This does not apply to periods (so `startDate` and `endDate` are set<br />
+&emsp;Default: `true`
 #### `baseCurrency?: Currency`
 &emsp;Currently ECB only supports Euro as base currency (dah!)<br />
 &emsp;Default: `{ code: 'EUR' }`
@@ -84,7 +87,8 @@ rate( [currencies["USD"], currencies["CAD"]] ).then(data => {
 import { currencies, rate, ExchangeRate, Frequency } from 'ecb-exchangerate';
 let options = {
 	frequency: Frequency.Annual,
-	startDate: new Date('2019-01-01');
+	startDate: new Date('2019-01-01'),
+	mostRecent: false
 }
 rate( currencies["USD"], options).then(data => {
 	let euro_usd: ExchangeRate = data.currencies["USD"].values[0];
