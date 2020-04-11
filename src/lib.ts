@@ -6,6 +6,15 @@ import { DataType } from './codelists/datatype';
 import { currencies }  from './codelists/currencies';
 import './date.extensions';
 
+
+/*
+    This is a dirty hack to get arround the problem that TS does
+    not work very well with Object.assign90 or object rest 
+    (https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-1.html#object-spread-and-rest). 
+    So the static analyser needs to be told that the properties of the object are now no longer optional.frequency
+    I dont know any other way around than to issue a bug report or du this.
+*/
+
 interface FixedExchangeRateOptions {
     frequency: Frequency,
     dataType: DataType,
@@ -32,9 +41,8 @@ export function defaults() : FixedExchangeRateOptions {
 
 export function rate(target: Currency | Currency[], opt?: ExchangeRateOptions) : Promise<ExchangeRateData> {
     
-    
     // apply default options
-    let options: FixedExchangeRateOptions =  Object.assign(defaults(), opt);
+    let options: FixedExchangeRateOptions =  { ...defaults(), ...opt };
 
     // build key
     let key: string = "";
@@ -81,6 +89,7 @@ export function rate(target: Currency | Currency[], opt?: ExchangeRateOptions) :
     if (options.mostRecent && options.endDate === null) path_extension += "&lastNObservations=1"
     path_extension += "&detail=dataonly";
 
+    // this function parses s series of data from the api return values
     const parseValues = (d: object, series: number) : { er: ExchangeRate[], cur: Currency } | null => {
         //@ts-ignore
         let obs = d.dataSets[0].series["0:"+series+":0:0:0"].observations;
@@ -109,7 +118,7 @@ export function rate(target: Currency | Currency[], opt?: ExchangeRateOptions) :
             return result;
     }
 
-    // get data
+    // node https.get parameter setup
     const baseUrl: string = "https://a-sdw-wsrest.ecb.int/service/data/ECB,EXR,1.0/";
     const request_options: RequestOptions = {
       headers: {
@@ -174,9 +183,10 @@ export function rate(target: Currency | Currency[], opt?: ExchangeRateOptions) :
 
 }
 
+// warpper for values at specific date (shorter synatx)
 export function rateAt(target: Currency | Currency[], date: Date, options?: ExchangeRateOptions) : Promise<ExchangeRateData> {
-    let opt: ExchangeRateOptions =  Object.assign({ startDate: date }, options);
-    if (!isToday(date)) {
+    let opt: ExchangeRateOptions =  Object.assign({ startDate: date, mostRecent: false }, options);
+    if (!isToday(date) && opt.mostRecent === false ) {
         let d = new Date();
         d.setUTCDate(date.getUTCDate() + 1);
         opt.endDate = d;
@@ -184,8 +194,9 @@ export function rateAt(target: Currency | Currency[], date: Date, options?: Exch
     return rate(target, opt);
 }
 
+// warpper for values in a period (shorter synatx)
 export function rateBetween(target: Currency | Currency[], startDate: Date, endDate: Date, options?: ExchangeRateOptions) : Promise<ExchangeRateData> {
-    let opt: ExchangeRateOptions =  Object.assign({ startDate, endDate }, options);
+    let opt: ExchangeRateOptions =  Object.assign({ startDate, endDate, mostRecent: false }, options);
     return rate(target, opt);
 }
 
@@ -228,7 +239,7 @@ function dateToECBDateFormat(d: Date, f: Frequency) : string {
 
 function isToday(d: Date) : boolean {
   const today = new Date()
-  return d.getDate() == today.getDate() &&
-         d.getMonth() == today.getMonth() &&
-         d.getFullYear() == today.getFullYear();
+  return d.getUTCDate() == today.getUTCDate() &&
+         d.getUTCMonth() == today.getUTCMonth() &&
+         d.getUTCFullYear() == today.getUTCFullYear();
 }
