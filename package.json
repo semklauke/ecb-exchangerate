@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/semklauke/ecb-exchangerate#readme",
   "dependencies": {
-    "@types/node": "^13.9.3",
+    "@types/node": "^10.17.0",
     "typescript": "^3.8.3"
   },
   "devDependencies": {
