@@ -3,8 +3,6 @@
         "target": "es5",
         "module": "commonjs",
         "moduleResolution": "node",
-        "allowJs": true,
-        "checkJs": true,
         "removeComments": true,
         "noImplicitAny": true,
         "declaration": true,
@@ -14,14 +12,11 @@
         "strict": true,
         "forceConsistentCasingInFileNames": true,
         "allowSyntheticDefaultImports": true,
-        "lib": ["es2017", "es7", "es6", "dom", "es5"]
+        "lib": ["es2017", "es7", "es6", "dom", "es5"],
+        "types": ["node"]
     },
     "include": ["src"],
     "exclude": [
         "node_modules", 
-        //"**/__tests__/*",
-        "./.git/", 
-        "./node_modules/", 
-        "./node_modules/**",
     ]
 }
