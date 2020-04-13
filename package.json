@@ -27,7 +27,7 @@
     "@types/node": "*"
   },
   "devDependencies": {
-    "@types/jest": "latest",
+    "@types/jest": "^25.2.1",
     "jest": "latest",
     "ts-jest": "latest"
   }
