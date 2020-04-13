@@ -43,6 +43,10 @@ export function defaults() : FixedExchangeRateOptions {
 
 export function rate(target: Currency | Currency[], opt?: ExchangeRateOptions) : Promise<ExchangeRateData> {
     
+    if (target === undefined)
+        return new Promise(function(resolve, reject){
+            reject(new Error("no currency was defined"));
+        });
     // apply default options
     let options: FixedExchangeRateOptions =  { ...defaults(), ...opt };
 
@@ -53,6 +57,10 @@ export function rate(target: Currency | Currency[], opt?: ExchangeRateOptions) :
     if (target instanceof Array) {
         const clength: number = target.length;
         for (let i = 0; i < clength; i++) {
+            if (target[i] === undefined)
+                return new Promise(function(resolve, reject){
+                    reject(new Error("some currency was undefined"));
+                });
             key += target[i].code;
             if (i != clength-1) key += "+";
             else key += ".";
