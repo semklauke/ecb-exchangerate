@@ -101,8 +101,13 @@ export function rate(target: Currency | Currency[], opt?: ExchangeRateOptions) :
 
     // this function parses s series of data from the api return values
     const parseValues = (d: object, series: number) : { er: ExchangeRate[], cur: Currency } | null => {
-        //@ts-ignore
-        let obs = d.dataSets[0].series["0:"+series+":0:0:0"].observations;
+        let obs;
+        try {
+            //@ts-ignore
+            obs = d.dataSets[0].series["0:"+series+":0:0:0"].observations;
+        } catch (e) {
+            return null;
+        }
         //@ts-ignore
         let structures = d.structure.dimensions;
         let dates = structures.observation[0].values;
