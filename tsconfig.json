@@ -13,7 +13,7 @@
         "forceConsistentCasingInFileNames": true,
         "allowSyntheticDefaultImports": true,
         "lib": ["es2017", "es7", "es6", "dom", "es5"],
-        "types": ["node", "jest"]
+        "types": ["node"]
     },
     "include": ["src"],
     "exclude": [
