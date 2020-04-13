@@ -125,11 +125,13 @@ export function rate(target: Currency | Currency[], opt?: ExchangeRateOptions) :
     const request_options: RequestOptions = {
       headers: {
         'Accept' : 'application/json'
-      }
+      },
+      host: 'a-sdw-wsrest.ecb.int',
+      path: '/service/data/ECB,EXR,1.0/'+path_extension
     }
 
     return new Promise<ExchangeRateData>(function(resolve, reject) {
-        const req = https_get(baseUrl+path_extension, request_options, (resp) => {
+        const req = https_get(request_options, (resp) => {
 
             if (resp.statusCode === 400 ||
                 resp.statusCode === 403 ||
