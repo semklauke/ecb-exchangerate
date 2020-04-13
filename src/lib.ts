@@ -252,7 +252,7 @@ function dateToECBDateFormat(d: Date, f: Frequency) : string {
             break;
         case Frequency.Daily: 
             period += "-" + ("00" + month).slice(-2);
-            period += "-" + ("00" + d.getDate()).slice(-2);
+            period += "-" + ("00" + d.getUTCDate()).slice(-2);
             break
         default:
             period = d.toISOString();
