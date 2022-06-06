@@ -105,7 +105,7 @@ export function rate(target: Currency | Currency[], opt?: ExchangeRateOptions) :
         try {
             //@ts-ignore
             obs = d.dataSets[0].series["0:"+series+":0:0:0"].observations;
-        } catch (e) {
+        } catch (e: any) {
             return null;
         }
         //@ts-ignore
@@ -134,15 +134,14 @@ export function rate(target: Currency | Currency[], opt?: ExchangeRateOptions) :
     }
 
     // node https.get parameter setup
-    const baseUrl: string = "https://a-sdw-wsrest.ecb.int/service/data/ECB,EXR,1.0/";
+    const baseUrl: string = "https://sdw-wsrest.ecb.europa.eu/service/data/ECB,EXR,1.0/";
     const request_options: RequestOptions = {
       headers: {
         'Accept' : 'application/json'
       },
-      host: 'a-sdw-wsrest.ecb.int',
+      host: 'sdw-wsrest.ecb.europa.eu',
       path: '/service/data/ECB,EXR,1.0/'+path_extension
     }
-
     return new Promise<ExchangeRateData>(function(resolve, reject) {
         const req = https_get(request_options, (resp) => {
 
@@ -204,6 +203,7 @@ export function rate(target: Currency | Currency[], opt?: ExchangeRateOptions) :
             }
 
         }).on("error", (err) => {
+            if (!err) err = new Error("https failed");
             reject(err);
         });
     });

@@ -1,6 +1,6 @@
 import { Currency } from './../types';
 
-export const currencies: { [code: string]: Currency } = {
+export const currencies: { readonly [code: string]: Currency } = {
     "ADF": { code: "ADF", name: "Andorran Franc (1-1 peg to the French franc)" },
     "ADP": { code: "ADP", name: "Andorran Peseta (1-1 peg to the Spanish peseta)" },
     "AED": { code: "AED", name: "United Arab Emirates dirham" },
